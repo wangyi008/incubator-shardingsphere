@@ -17,10 +17,10 @@
 
 grammar DDLStatement;
 
-import Symbol, Keyword, Literals, BaseRule;
+import Symbol, Keyword, MySQLKeyword, Literals, BaseRule;
 
 createTable
-    : CREATE createTableSpecification_ TABLE tableNotExistClause_ tableName (createDefinitionClause_ | createLikeClause_)
+    : CREATE createTableSpecification_? TABLE tableNotExistClause_ tableName (createDefinitionClause_ | createLikeClause_)
     ;
 
 createIndex
@@ -36,7 +36,7 @@ dropTable
     ;
 
 dropIndex
-    : DROP INDEX dropIndexSpecification_ indexName ON tableName
+    : DROP INDEX dropIndexSpecification_? indexName (ON tableName)?
     ;
 
 truncateTable
@@ -44,7 +44,7 @@ truncateTable
     ;
 
 createTableSpecification_
-    : TEMPORARY?
+    : TEMPORARY
     ;
 
 tableNotExistClause_
@@ -261,7 +261,6 @@ modifyColumnSpecification
     : MODIFY COLUMN? columnDefinition firstOrAfterColumn?
     ;
 
-// TODO hongjun: parse renameColumnSpecification and refresh meta, but throw exception if is sharding column
 renameColumnSpecification
     : RENAME COLUMN columnName TO columnName
     ;
@@ -271,13 +270,8 @@ renameIndexSpecification
     : RENAME (INDEX | KEY) indexName TO indexName
     ;
 
-// TODO hongjun: parse renameTableSpecification_ and refresh meta, but throw exception if is sharding table
 renameTableSpecification_
-    : RENAME (TO | AS)? newTableName
-    ;
-
-newTableName
-    : identifier_
+    : RENAME (TO | AS)? identifier_
     ;
 
 partitionDefinitions_
@@ -322,5 +316,5 @@ tableExistClause_
     ;
 
 dropIndexSpecification_
-    : (ONLINE | OFFLINE)?
+    : ONLINE | OFFLINE
     ;

@@ -25,12 +25,11 @@ import org.apache.shardingsphere.core.execute.sql.execute.result.StreamQueryResu
 import org.apache.shardingsphere.core.merge.MergeEngine;
 import org.apache.shardingsphere.core.merge.MergeEngineFactory;
 import org.apache.shardingsphere.core.optimize.GeneratedKey;
-import org.apache.shardingsphere.core.parse.antlr.sql.statement.dal.DALStatement;
-import org.apache.shardingsphere.core.parse.antlr.sql.statement.dml.DQLStatement;
-import org.apache.shardingsphere.core.parse.antlr.sql.statement.dml.InsertStatement;
-import org.apache.shardingsphere.core.parse.antlr.sql.statement.dml.SelectStatement;
+import org.apache.shardingsphere.core.parse.sql.statement.dal.DALStatement;
+import org.apache.shardingsphere.core.parse.sql.statement.dml.DQLStatement;
+import org.apache.shardingsphere.core.parse.sql.statement.dml.InsertStatement;
+import org.apache.shardingsphere.core.parse.sql.statement.dml.SelectStatement;
 import org.apache.shardingsphere.core.route.SQLRouteResult;
-import org.apache.shardingsphere.core.rule.ShardingRule;
 import org.apache.shardingsphere.shardingjdbc.executor.StatementExecutor;
 import org.apache.shardingsphere.shardingjdbc.jdbc.adapter.AbstractStatementAdapter;
 import org.apache.shardingsphere.shardingjdbc.jdbc.core.ShardingContext;
@@ -113,8 +112,7 @@ public final class ShardingStatement extends AbstractStatementAdapter {
         for (Statement each : statementExecutor.getStatements()) {
             ResultSet resultSet = each.getResultSet();
             resultSets.add(resultSet);
-            ShardingRule shardingRule = connection.getShardingContext().getShardingRule();
-            queryResults.add(new StreamQueryResult(resultSet, shardingRule, shardingRule.getShardingEncryptorEngine()));
+            queryResults.add(new StreamQueryResult(resultSet, connection.getShardingContext().getShardingRule()));
         }
         if (routeResult.getSqlStatement() instanceof SelectStatement || routeResult.getSqlStatement() instanceof DALStatement) {
             MergeEngine mergeEngine = MergeEngineFactory.newInstance(connection.getShardingContext().getDatabaseType(),

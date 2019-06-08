@@ -24,11 +24,11 @@ import org.apache.shardingsphere.api.hint.HintManager;
 import org.apache.shardingsphere.core.optimize.condition.ShardingCondition;
 import org.apache.shardingsphere.core.optimize.result.OptimizeResult;
 import org.apache.shardingsphere.core.optimize.result.insert.InsertOptimizeResultUnit;
-import org.apache.shardingsphere.core.parse.antlr.sql.statement.SQLStatement;
-import org.apache.shardingsphere.core.parse.antlr.sql.statement.dml.InsertStatement;
+import org.apache.shardingsphere.core.parse.sql.statement.SQLStatement;
+import org.apache.shardingsphere.core.parse.sql.statement.dml.InsertStatement;
 import org.apache.shardingsphere.core.route.type.RoutingEngine;
 import org.apache.shardingsphere.core.route.type.RoutingResult;
-import org.apache.shardingsphere.core.route.type.RoutingTable;
+import org.apache.shardingsphere.core.route.type.RoutingUnit;
 import org.apache.shardingsphere.core.route.type.TableUnit;
 import org.apache.shardingsphere.core.rule.BindingTableRule;
 import org.apache.shardingsphere.core.rule.DataNode;
@@ -74,9 +74,9 @@ public final class StandardRoutingEngine implements RoutingEngine {
     private RoutingResult generateRoutingResult(final Collection<DataNode> routedDataNodes) {
         RoutingResult result = new RoutingResult();
         for (DataNode each : routedDataNodes) {
-            TableUnit tableUnit = new TableUnit(each.getDataSourceName());
-            tableUnit.getRoutingTables().add(new RoutingTable(logicTableName, each.getTableName()));
-            result.getTableUnits().getTableUnits().add(tableUnit);
+            RoutingUnit routingUnit = new RoutingUnit(each.getDataSourceName());
+            routingUnit.getTableUnits().add(new TableUnit(logicTableName, each.getTableName()));
+            result.getRoutingUnits().add(routingUnit);
         }
         return result;
     }
@@ -221,14 +221,14 @@ public final class StandardRoutingEngine implements RoutingEngine {
     private void reviseInsertOptimizeResult(final ShardingCondition shardingCondition, final Collection<DataNode> dataNodes) {
         if (sqlStatement instanceof InsertStatement) {
             for (InsertOptimizeResultUnit each : optimizeResult.getInsertOptimizeResult().get().getUnits()) {
-                if (isQualifiedInsertOptimizeResult(each, shardingCondition)) {
+                if (isQualifiedInsertOptimizeResultUnit(each, shardingCondition)) {
                     each.getDataNodes().addAll(dataNodes);
                 }
             }
         }
     }
     
-    private boolean isQualifiedInsertOptimizeResult(final InsertOptimizeResultUnit unit, final ShardingCondition shardingCondition) {
+    private boolean isQualifiedInsertOptimizeResultUnit(final InsertOptimizeResultUnit unit, final ShardingCondition shardingCondition) {
         for (RouteValue each : shardingCondition.getShardingValues()) {
             Object columnValue = unit.getColumnValue(each.getColumnName());
             if (!columnValue.equals(((ListRouteValue) each).getValues().iterator().next())) {

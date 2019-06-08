@@ -33,8 +33,8 @@ import org.apache.shardingsphere.core.merge.dql.orderby.OrderByStreamMergedResul
 import org.apache.shardingsphere.core.merge.dql.pagination.LimitDecoratorMergedResult;
 import org.apache.shardingsphere.core.merge.dql.pagination.RowNumberDecoratorMergedResult;
 import org.apache.shardingsphere.core.merge.dql.pagination.TopAndRowNumberDecoratorMergedResult;
-import org.apache.shardingsphere.core.parse.antlr.sql.statement.dml.SelectStatement;
-import org.apache.shardingsphere.core.parse.old.parser.context.limit.Limit;
+import org.apache.shardingsphere.core.optimize.pagination.Pagination;
+import org.apache.shardingsphere.core.parse.sql.statement.dml.SelectStatement;
 import org.apache.shardingsphere.core.parse.util.SQLUtil;
 import org.apache.shardingsphere.core.route.SQLRouteResult;
 
@@ -135,18 +135,18 @@ public final class DQLMergeEngine implements MergeEngine {
     }
     
     private MergedResult decorate(final MergedResult mergedResult) throws SQLException {
-        Limit limit = routeResult.getLimit();
-        if (null == limit || 1 == queryResults.size()) {
+        Pagination pagination = routeResult.getOptimizeResult().getPagination();
+        if (null == pagination || 1 == queryResults.size()) {
             return mergedResult;
         }
         if (DatabaseType.MySQL == databaseType || DatabaseType.PostgreSQL == databaseType || DatabaseType.H2 == databaseType) {
-            return new LimitDecoratorMergedResult(mergedResult, routeResult.getLimit());
+            return new LimitDecoratorMergedResult(mergedResult, routeResult.getOptimizeResult().getPagination());
         }
         if (DatabaseType.Oracle == databaseType) {
-            return new RowNumberDecoratorMergedResult(mergedResult, routeResult.getLimit());
+            return new RowNumberDecoratorMergedResult(mergedResult, routeResult.getOptimizeResult().getPagination());
         }
         if (DatabaseType.SQLServer == databaseType) {
-            return new TopAndRowNumberDecoratorMergedResult(mergedResult, routeResult.getLimit());
+            return new TopAndRowNumberDecoratorMergedResult(mergedResult, routeResult.getOptimizeResult().getPagination());
         }
         return mergedResult;
     }

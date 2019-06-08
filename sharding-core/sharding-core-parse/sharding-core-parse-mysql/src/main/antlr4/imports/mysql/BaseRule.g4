@@ -17,7 +17,7 @@
 
 grammar BaseRule;
 
-import Symbol, Keyword, Literals;
+import Symbol, Keyword, MySQLKeyword, Literals;
 
 parameterMarker
     : QUESTION_
@@ -38,7 +38,7 @@ stringLiterals
     ;
 
 numberLiterals
-   : NUMBER_
+   : MINUS_? NUMBER_
    ;
 
 dateTimeLiterals
@@ -60,10 +60,6 @@ booleanLiterals
 
 nullValueLiterals
     : NULL
-    ;
-
-characterSetName_
-    : IDENTIFIER_
     ;
 
 identifier_
@@ -96,15 +92,28 @@ unreservedWord_
     | QUARTER | YEAR | AGAINST | LANGUAGE | MODE | QUERY | EXPANSION
     | BOOLEAN | MAX | MIN | SUM | COUNT | AVG | BIT_AND
     | BIT_OR | BIT_XOR | GROUP_CONCAT | JSON_ARRAYAGG | JSON_OBJECTAGG | STD | STDDEV
-    | STDDEV_POP | STDDEV_SAMP | VAR_POP | VAR_SAMP | VARIANCE
+    | STDDEV_POP | STDDEV_SAMP | VAR_POP | VAR_SAMP | VARIANCE | EXTENDED | STATUS
+    | FIELDS | INDEXES | USER | ROLE | OJ | AUTOCOMMIT
+    ;
+
+schemaName
+    : identifier_
     ;
 
 tableName
-    : (identifier_ DOT_)? identifier_
+    : (owner DOT_)? name
     ;
 
 columnName
-    : (identifier_ DOT_)? identifier_
+    : (owner DOT_)? name
+    ;
+
+owner
+    : identifier_
+    ;
+
+name
+    : identifier_
     ;
 
 columnNames
@@ -117,6 +126,10 @@ tableNames
 
 indexName
     : identifier_
+    ;
+
+characterSetName_
+    : IDENTIFIER_
     ;
 
 expr
@@ -297,7 +310,7 @@ regularFunction_
     ;
 
 regularFunctionName_
-    : identifier_ | IF | CURRENT_TIMESTAMP | LOCALTIME | LOCALTIMESTAMP | NOW | REPLACE
+    : identifier_ | IF | CURRENT_TIMESTAMP | LOCALTIME | LOCALTIMESTAMP | NOW | REPLACE | INTERVAL
     ;
 
 matchExpression_

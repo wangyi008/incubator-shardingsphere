@@ -23,7 +23,10 @@ import org.apache.shardingsphere.core.execute.sql.execute.result.QueryResult;
 import org.apache.shardingsphere.core.merge.MergedResult;
 import org.apache.shardingsphere.core.merge.dql.DQLMergeEngine;
 import org.apache.shardingsphere.core.merge.fixture.TestQueryResult;
-import org.apache.shardingsphere.core.parse.antlr.sql.statement.dml.SelectStatement;
+import org.apache.shardingsphere.core.optimize.condition.ShardingCondition;
+import org.apache.shardingsphere.core.optimize.condition.ShardingConditions;
+import org.apache.shardingsphere.core.optimize.result.OptimizeResult;
+import org.apache.shardingsphere.core.parse.sql.statement.dml.SelectStatement;
 import org.apache.shardingsphere.core.route.SQLRouteResult;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +34,7 @@ import org.junit.Test;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertFalse;
@@ -44,8 +48,6 @@ public final class IteratorStreamMergedResultTest {
     
     private List<QueryResult> queryResults;
     
-    private SelectStatement selectStatement;
-    
     private SQLRouteResult routeResult;
     
     @Before
@@ -53,11 +55,9 @@ public final class IteratorStreamMergedResultTest {
         ResultSet resultSet = mock(ResultSet.class);
         ResultSetMetaData resultSetMetaData = mock(ResultSetMetaData.class);
         when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
-        queryResults = Lists.<QueryResult>newArrayList(
-                new TestQueryResult(resultSet), new TestQueryResult(mock(ResultSet.class)), new TestQueryResult(mock(ResultSet.class)));
-        selectStatement = new SelectStatement();
-        routeResult = new SQLRouteResult(selectStatement);
-        routeResult.setLimit(selectStatement.getLimit());
+        queryResults = Lists.<QueryResult>newArrayList(new TestQueryResult(resultSet), new TestQueryResult(mock(ResultSet.class)), new TestQueryResult(mock(ResultSet.class)));
+        routeResult = new SQLRouteResult(new SelectStatement());
+        routeResult.setOptimizeResult(new OptimizeResult(new ShardingConditions(Collections.<ShardingCondition>emptyList())));
     }
     
     @Test
