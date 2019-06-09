@@ -15,34 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.shardingsphere.core.parse;
-
-import org.antlr.v4.runtime.Lexer;
-import org.apache.shardingsphere.core.parse.api.SQLParser;
-import org.apache.shardingsphere.core.parse.autogen.MySQLStatementLexer;
-import org.apache.shardingsphere.core.parse.spi.SQLParserEntry;
-import org.apache.shardingsphere.spi.DatabaseTypes;
-import org.apache.shardingsphere.spi.DbType;
+package org.apache.shardingsphere.spi;
 
 /**
- * SQL parser entry for MySQL.
+ * Database type.
  *
  * @author zhangliang
  */
-public final class MySQLParserEntry implements SQLParserEntry {
+public interface DbType {
     
-    @Override
-    public DbType getDatabaseType() {
-        return DatabaseTypes.getDatabaseType("MySQL");
-    }
+    /**
+     * Get database name.
+     * 
+     * @return database name
+     */
+    String getName();
     
-    @Override
-    public Class<? extends Lexer> getLexerClass() {
-        return MySQLStatementLexer.class;
-    }
-    
-    @Override
-    public Class<? extends SQLParser> getParserClass() {
-        return MySQLParser.class;
-    }
+    /**
+     * Get database product name.
+     * 
+     * @return database product name
+     */
+    String getProductName();
 }
