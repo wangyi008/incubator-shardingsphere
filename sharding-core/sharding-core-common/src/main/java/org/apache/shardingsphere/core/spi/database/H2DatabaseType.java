@@ -39,7 +39,7 @@ public final class H2DatabaseType implements BranchDatabaseType {
     }
     
     @Override
-    public DbType getMasterDatabaseType() {
-        return DatabaseTypes.getDatabaseType("MySQL");
+    public DbType getTrunkDatabaseType() {
+        return DatabaseTypes.getActualDatabaseType("MySQL");
     }
 }
