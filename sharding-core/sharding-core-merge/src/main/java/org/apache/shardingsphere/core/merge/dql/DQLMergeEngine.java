@@ -20,7 +20,7 @@ package org.apache.shardingsphere.core.merge.dql;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import lombok.Getter;
-import org.apache.shardingsphere.core.constant.DatabaseType;
+import org.apache.shardingsphere.core.database.DatabaseTypes;
 import org.apache.shardingsphere.core.execute.sql.execute.result.AggregationDistinctQueryResult;
 import org.apache.shardingsphere.core.execute.sql.execute.result.DistinctQueryResult;
 import org.apache.shardingsphere.core.execute.sql.execute.result.QueryResult;
@@ -37,6 +37,7 @@ import org.apache.shardingsphere.core.optimize.pagination.Pagination;
 import org.apache.shardingsphere.core.parse.sql.statement.dml.SelectStatement;
 import org.apache.shardingsphere.core.parse.util.SQLUtil;
 import org.apache.shardingsphere.core.route.SQLRouteResult;
+import org.apache.shardingsphere.spi.database.DatabaseType;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -139,13 +140,14 @@ public final class DQLMergeEngine implements MergeEngine {
         if (null == pagination || 1 == queryResults.size()) {
             return mergedResult;
         }
-        if (DatabaseType.MySQL == databaseType || DatabaseType.PostgreSQL == databaseType || DatabaseType.H2 == databaseType) {
+        String trunkDatabaseName = DatabaseTypes.getTrunkDatabaseType(databaseType.getName()).getName();
+        if ("MySQL".equals(trunkDatabaseName) || "PostgreSQL".equals(trunkDatabaseName)) {
             return new LimitDecoratorMergedResult(mergedResult, routeResult.getOptimizeResult().getPagination());
         }
-        if (DatabaseType.Oracle == databaseType) {
+        if ("Oracle".equals(trunkDatabaseName)) {
             return new RowNumberDecoratorMergedResult(mergedResult, routeResult.getOptimizeResult().getPagination());
         }
-        if (DatabaseType.SQLServer == databaseType) {
+        if ("SQLServer".equals(trunkDatabaseName)) {
             return new TopAndRowNumberDecoratorMergedResult(mergedResult, routeResult.getOptimizeResult().getPagination());
         }
         return mergedResult;

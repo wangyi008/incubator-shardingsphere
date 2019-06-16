@@ -20,8 +20,8 @@ package org.apache.shardingsphere.core.merge.dql.groupby;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import org.apache.shardingsphere.core.constant.AggregationType;
-import org.apache.shardingsphere.core.constant.DatabaseType;
 import org.apache.shardingsphere.core.constant.OrderDirection;
+import org.apache.shardingsphere.core.database.DatabaseTypes;
 import org.apache.shardingsphere.core.execute.sql.execute.result.QueryResult;
 import org.apache.shardingsphere.core.merge.MergedResult;
 import org.apache.shardingsphere.core.merge.dql.DQLMergeEngine;
@@ -102,14 +102,14 @@ public final class GroupByMemoryMergedResultTest {
     
     @Test
     public void assertNextForResultSetsAllEmpty() throws SQLException {
-        mergeEngine = new DQLMergeEngine(DatabaseType.MySQL, routeResult, queryResults);
+        mergeEngine = new DQLMergeEngine(DatabaseTypes.getActualDatabaseType("MySQL"), routeResult, queryResults);
         MergedResult actual = mergeEngine.merge();
         assertFalse(actual.next());
     }
     
     @Test
     public void assertNextForSomeResultSetsEmpty() throws SQLException {
-        mergeEngine = new DQLMergeEngine(DatabaseType.MySQL, routeResult, queryResults);
+        mergeEngine = new DQLMergeEngine(DatabaseTypes.getActualDatabaseType("MySQL"), routeResult, queryResults);
         when(resultSets.get(0).next()).thenReturn(true, false);
         when(resultSets.get(0).getObject(1)).thenReturn(20);
         when(resultSets.get(0).getObject(2)).thenReturn(0);

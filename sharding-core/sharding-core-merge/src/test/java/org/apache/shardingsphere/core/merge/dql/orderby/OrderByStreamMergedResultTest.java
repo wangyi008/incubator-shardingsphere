@@ -18,8 +18,8 @@
 package org.apache.shardingsphere.core.merge.dql.orderby;
 
 import com.google.common.collect.Lists;
-import org.apache.shardingsphere.core.constant.DatabaseType;
 import org.apache.shardingsphere.core.constant.OrderDirection;
+import org.apache.shardingsphere.core.database.DatabaseTypes;
 import org.apache.shardingsphere.core.execute.sql.execute.result.QueryResult;
 import org.apache.shardingsphere.core.merge.MergedResult;
 import org.apache.shardingsphere.core.merge.dql.DQLMergeEngine;
@@ -69,14 +69,14 @@ public final class OrderByStreamMergedResultTest {
     
     @Test
     public void assertNextForResultSetsAllEmpty() throws SQLException {
-        mergeEngine = new DQLMergeEngine(DatabaseType.MySQL, routeResult, queryResults);
+        mergeEngine = new DQLMergeEngine(DatabaseTypes.getActualDatabaseType("MySQL"), routeResult, queryResults);
         MergedResult actual = mergeEngine.merge();
         assertFalse(actual.next());
     }
     
     @Test
     public void assertNextForSomeResultSetsEmpty() throws SQLException {
-        mergeEngine = new DQLMergeEngine(DatabaseType.MySQL, routeResult, queryResults);
+        mergeEngine = new DQLMergeEngine(DatabaseTypes.getActualDatabaseType("MySQL"), routeResult, queryResults);
         when(queryResults.get(0).next()).thenReturn(true, false);
         when(queryResults.get(0).getValue(1, Object.class)).thenReturn("2");
         when(queryResults.get(2).next()).thenReturn(true, true, false);
@@ -93,7 +93,7 @@ public final class OrderByStreamMergedResultTest {
     
     @Test
     public void assertNextForMix() throws SQLException {
-        mergeEngine = new DQLMergeEngine(DatabaseType.MySQL, routeResult, queryResults);
+        mergeEngine = new DQLMergeEngine(DatabaseTypes.getActualDatabaseType("MySQL"), routeResult, queryResults);
         when(queryResults.get(0).next()).thenReturn(true, false);
         when(queryResults.get(0).getValue(1, Object.class)).thenReturn("2");
         when(queryResults.get(1).next()).thenReturn(true, true, true, false);

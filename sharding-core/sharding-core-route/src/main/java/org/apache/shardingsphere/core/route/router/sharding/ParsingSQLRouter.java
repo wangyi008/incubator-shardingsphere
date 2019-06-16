@@ -41,7 +41,7 @@ import org.apache.shardingsphere.core.rule.ShardingRule;
 import org.apache.shardingsphere.core.rule.TableRule;
 import org.apache.shardingsphere.core.strategy.route.value.ListRouteValue;
 import org.apache.shardingsphere.core.strategy.route.value.RouteValue;
-import org.apache.shardingsphere.spi.DbType;
+import org.apache.shardingsphere.spi.database.DatabaseType;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -61,7 +61,7 @@ public final class ParsingSQLRouter implements ShardingRouter {
     
     private final ShardingMetaData shardingMetaData;
     
-    private final DbType databaseType;
+    private final DatabaseType databaseType;
     
     private final ParsingResultCache parsingResultCache;
     
@@ -89,7 +89,7 @@ public final class ParsingSQLRouter implements ShardingRouter {
         Optional<GeneratedKey> generatedKey = sqlStatement instanceof InsertStatement
                 ? GeneratedKey.getGenerateKey(shardingRule, parameters, (InsertStatement) sqlStatement) : Optional.<GeneratedKey>absent();
         SQLRouteResult result = new SQLRouteResult(sqlStatement, generatedKey.orNull());
-        OptimizeResult optimizeResult = OptimizeEngineFactory.newInstance(shardingRule, sqlStatement, parameters, generatedKey.orNull()).optimize();
+        OptimizeResult optimizeResult = OptimizeEngineFactory.newInstance(shardingRule, sqlStatement, parameters, generatedKey.orNull(), shardingMetaData.getTable()).optimize();
         if (generatedKey.isPresent()) {
             setGeneratedKeys(result, generatedKey.get());
         }
